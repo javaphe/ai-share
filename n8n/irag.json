@@ -1,0 +1,247 @@
+{
+  "name": "irag",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "upload data to rag",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "file",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf,.csv"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        32,
+        80
+      ],
+      "id": "3e6a1fc4-e794-40be-b946-b190f601e8f2",
+      "name": "On form submission",
+      "webhookId": "c89a051f-32e7-472c-979e-ad4b94dc3f37"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        80
+      ],
+      "id": "d6788f4e-83f8-4150-a3db-81735e682801",
+      "name": "Simple Vector Store"
+    },
+    {
+      "parameters": {
+        "model": "bge-m3:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        720,
+        496
+      ],
+      "id": "28f411a8-94b7-4f11-a1b6-b0ea951d866b",
+      "name": "Embeddings Ollama"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        224
+      ],
+      "id": "996ec269-57cc-4c9c-b4a0-7c26b3a970b7",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        832,
+        16
+      ],
+      "id": "6ca3bf60-59fc-42c7-9939-5724340b5c5b",
+      "name": "When chat message received",
+      "webhookId": "3ff819a6-23f7-49b3-81f0-dfa11015da0f"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1040,
+        16
+      ],
+      "id": "189e3bd5-7eef-473d-92ad-c104ae7969a4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        896,
+        224
+      ],
+      "id": "5a5d5132-2d56-4955-a83b-12a828a0fb51",
+      "name": "DeepSeek Chat Model"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use this knowledge base to answer questions from the user",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        1072,
+        240
+      ],
+      "id": "aed99de7-f692-40fe-85fb-e46079344996",
+      "name": "Simple Vector Store1"
+    },
+    {
+      "parameters": {
+        "content": "## doc to rag",
+        "height": 384,
+        "width": 656
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "df60c5f5-e1df-4937-9530-6924c2a5e5df",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "##chat ask",
+        "height": 384,
+        "width": 704
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "4b0654d2-7e82-46eb-84b9-6d3a33b3f5e2",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Simple Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ca06c3eb-d9bd-498d-844c-517b6c27695d",
+  "meta": {
+    "instanceId": "d7c18ee51764ea33894bab84c2e02584e917aac32d2c2e0aa44f266a9f4b842a"
+  },
+  "id": "ATIivT5sInX01N0O",
+  "tags": []
+}
